@@ -1,0 +1,1 @@
+return game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("BuildGui")

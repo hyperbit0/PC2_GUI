@@ -1,0 +1,3 @@
+local BuildMenuCategory2ButtonsController = {}
+
+return BuildMenuCategory2ButtonsController
