@@ -1,7 +1,7 @@
 local BuildGui = require(script.Parent.BuildGui)
 local BuildMenuCategory1Container = require(script.Parent.BuildMenuCategory1Container)
 
-local Theme = require(script.Parent.CurrentTheme.Value).ToolTrayButtons
+--local Theme = require(script.Parent.CurrentTheme.Value).ToolTrayButtons
 
 local BUILD_BUTTON = BuildGui.Protect.ToolContainer.Tools.BuildButton
 local DELETE_BUTTON = BuildGui.Protect.ToolContainer.Tools.DeleteButton
@@ -10,6 +10,7 @@ local MOVE_BUTTON = BuildGui.Protect.ToolContainer.Tools.MoveButton
 local PAINT_BUTTON = BuildGui.Protect.ToolContainer.Tools.PaintButton
 
 local ToolTrayButtons = {}
+local Theme
 
 ToolTrayButtons.Tools = {
 	Build = {
@@ -70,6 +71,14 @@ ToolTrayButtons.New = function()
 			}
 		})
 	end
+end
+
+function ToolTrayButtons:Awake()
+
+end
+
+function ToolTrayButtons:Start()
+	Theme = ToolTrayButtons.Controllers.ThemeController.CurrentTheme.ToolTrayButtons
 end
 
 return ToolTrayButtons

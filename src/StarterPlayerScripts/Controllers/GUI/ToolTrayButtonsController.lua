@@ -60,7 +60,6 @@ local function createButtonEffects()
 	end
 end
 
-
 function ToolTrayButtonsController:Awake()
 	ToolTrayButtonsController:CreateEvent("BuildButton")
 end

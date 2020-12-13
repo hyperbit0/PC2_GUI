@@ -1,18 +1,23 @@
 local Themes = script.Parent.Parent.Parent.Models.GUI.Themes
-local CurrentTheme = script.Parent.Parent.Parent.Models.GUI.CurrentTheme
-
-local DEFAULT_THEME = Themes.DarkTheme
+local DEFAULT_THEME = require(Themes.DarkTheme)
 
 local ThemeController = {}
 
-local function refreshTheme()
---hia
+function ThemeController:RefreshTheme()
+	--Call affected modules to use new CurrentTheme
+end
+
+function ThemeController:GetCurrentTheme()
+	if not self.CurrentTheme then return DEFAULT_THEME end
+	return self.CurrentTheme
+end
+
+function ThemeController.NewTheme()
+	return setmetatable({CurrentTheme = DEFAULT_THEME}, {__index = ThemeController})
 end
 
 function ThemeController:Awake()
-	if not CurrentTheme then
-		CurrentTheme.Value = DEFAULT_THEME
-	end
+	return ThemeController.NewTheme()
 end
 
 function ThemeController:Start()
