@@ -14,12 +14,10 @@ jobs:
     steps:
       - name: Checkout main branch
         uses: actions/checkout@v2
-      - name: Install cargo
-        uses: actions-rs/install@v0.1.2
-        with:
-          crate: cargo-audit
-          version: latest
       - name: Install selene
-        run: cargo install selene
+        uses: actions-rs/install@v0.1
+        with:
+          crate: selene
+          version: latest
       - name: Lint check
         run: selene ./
