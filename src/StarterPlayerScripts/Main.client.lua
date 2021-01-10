@@ -2,14 +2,14 @@ if not game:IsLoaded() then
 	game.Loaded:Wait()
 end
 
-local EventHandler = require(script.Parent:WaitForChild("Core").EventHandler)
-local ClassHandler = require(script.Parent:WaitForChild("Core").ClassHandler)
+local Core = script.Parent:WaitForChild("Core")
+local EventHandler = require(Core.EventHandler)
+local ClassHandler = require(Core.ClassHandler)
 
 local PC = {
 	Controllers = {},
 	Models = {}
 }
-local Instances = {}
 
 local function gatherControllers()
 	for _,v in pairs(script.Parent:WaitForChild("Controllers"):GetDescendants()) do
@@ -49,13 +49,14 @@ local function gatherModules() --Pool all controllers to prepare calling Awake()
 end
 
 local function attachEvents()
-	for _, class in pairs(PC) do
-		for _, module in pairs(class) do
-			EventHandler.Attach(module)
+	for className, class in pairs(PC) do
+		for moduleName, module in pairs(class) do
+			local inst = EventHandler.Attach(module)
+			ClassHandler.MergeIndex(inst, PC)
+			PC[className][moduleName] = inst
 		end
 	end
 end
-
 
 local function awakeModule(module)
 	if module.Awake then
@@ -63,40 +64,11 @@ local function awakeModule(module)
 	end
 end
 
-local function awakeModules() --Call Awake() methods synchronously and check for instances if applicable
-	for className, class in pairs(PC) do
-		if typeof(class) == "table" then
-			for moduleName, module in pairs(class) do
-				local inst = awakeModule(module)
-				if inst then
-					table.insert(Instances, {className, moduleName, inst})
-				end
-			end
-		end
-	end
-end
-
-local function attachModules()
-	local mt = {__index = PC}
-
-	for i,v in pairs(EventHandler) do
-		if i ~= "__index" then
-			mt.__index[i] = v
-		end
-	end
-
-	for _,instanceInfo in pairs(Instances) do 
-		local className, moduleName, inst = unpack(instanceInfo)
-		if getmetatable(inst) then
-			inst = ClassHandler.MergeClass(inst) --Transfer existing class methods and properties directly into the instance table
-		end
-		PC[className][moduleName] = inst --Replace modules with their instances in shared table
-	end
-
+local function awakeModules() --Call Awake() methods synchronously and check for instances (returned values in Awake()) if applicable
 	for _, class in pairs(PC) do
 		if typeof(class) == "table" then
 			for _, module in pairs(class) do
-				module = setmetatable(module, mt)
+				awakeModule(module)
 			end
 		end
 	end
@@ -104,7 +76,7 @@ end
 
 local function startModule(moduleName, module)
 	coroutine.wrap(function()
-		local success = pcall(function()
+		local success, res = pcall(function()
 			if module.Start then
 				return module:Start()
 			end
@@ -112,7 +84,7 @@ local function startModule(moduleName, module)
 		end)
 
 		if not success then
-			warn("Could not start ".. moduleName)
+			warn("Could not start ".. moduleName, res)
 		end
 	end)()
 end
@@ -128,7 +100,6 @@ local function startModules() --Call Start() methods asynchronously
 end
 
 gatherModules() --Populate Controllers and Models table
-attachEvents() --Inject EventHandler functions in each module
+attachEvents() --Inject EventHandler functions and PC table in each module
 awakeModules() --Where modules set up events and other essential actions before use
-attachModules() --Replace modules with their instances and inject modules in each other
 startModules() --Where modules can start communicating and accessing other modules

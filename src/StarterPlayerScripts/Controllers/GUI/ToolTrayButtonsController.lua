@@ -1,5 +1,4 @@
 local ToolTrayButtons = require(script.Parent.Parent.Parent.Models.GUI.ToolTrayButtons)
-
 local UIS = game:GetService("UserInputService")
 
 local BUILD_KEY = Enum.KeyCode.One
@@ -26,7 +25,7 @@ local function checkEvents()
 	end
 end
 
-local function onInput(input, gameProcessedEvent)
+local function onInput(input)
 	if Keybinds[input.KeyCode] then
 		Keybinds[input.KeyCode]:onClick()
 		checkEvents()
@@ -53,7 +52,7 @@ local function onToolTrayButtonMouseLeave(tool)
 end
 
 local function createButtonEffects()
-	for i,tool in pairs(ToolTrayButtons.Tools) do
+	for _,tool in pairs(ToolTrayButtons.Tools) do
 		onToolTrayButtonMouseEnter(tool)
 		onToolTrayButtonMouseLeave(tool)
 		onToolTrayButtonClick(tool)
@@ -61,13 +60,18 @@ local function createButtonEffects()
 end
 
 function ToolTrayButtonsController:Awake()
-	ToolTrayButtonsController:CreateEvent("BuildButton")
+	ToolTrayButtonsController = self
+	ToolTrayButtons = self.Models.ToolTrayButtons
+	self:CreateEvent("BuildButton")
 end
 
 function ToolTrayButtonsController:Start()
 	ToolTrayButtons.New()
 	createButtonEffects()
 	UIS.InputBegan:Connect(onInput)
+	self.Models.ToolTrayButtons:GetPropertyChanged("Something"):Connect(function(_, v)
+		print(v)
+	end)
 end
 
 return ToolTrayButtonsController

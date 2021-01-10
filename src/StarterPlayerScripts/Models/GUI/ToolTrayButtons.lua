@@ -1,13 +1,9 @@
-local BuildGui = require(script.Parent.BuildGui)
-local BuildMenuCategory1Container = require(script.Parent.BuildMenuCategory1Container)
-
---local Theme = require(script.Parent.CurrentTheme.Value).ToolTrayButtons
-
-local BUILD_BUTTON = BuildGui.Protect.ToolContainer.Tools.BuildButton
-local DELETE_BUTTON = BuildGui.Protect.ToolContainer.Tools.DeleteButton
-local CONFIGURE_BUTTON = BuildGui.Protect.ToolContainer.Tools.ConfigureButton
-local MOVE_BUTTON = BuildGui.Protect.ToolContainer.Tools.MoveButton
-local PAINT_BUTTON = BuildGui.Protect.ToolContainer.Tools.PaintButton
+local Container = require(script.Parent.BuildGui).Protect.ToolContainer.Tools
+local BUILD_BUTTON = Container.BuildButton
+local DELETE_BUTTON = Container.DeleteButton
+local CONFIGURE_BUTTON = Container.ConfigureButton
+local MOVE_BUTTON = Container.MoveButton
+local PAINT_BUTTON = Container.PaintButton
 
 local ToolTrayButtons = {}
 local Theme
@@ -35,8 +31,10 @@ ToolTrayButtons.Tools = {
 	}
 }
 
+ToolTrayButtons.Something = 3
+
 ToolTrayButtons.New = function()
-	for i,v in pairs(ToolTrayButtons.Tools) do
+	for _,v in pairs(ToolTrayButtons.Tools) do
 		v = setmetatable(v,{
 			__index = {
 				Active = false,
@@ -62,7 +60,7 @@ ToolTrayButtons.New = function()
 						return
 					end
 
-					for a,b in pairs(ToolTrayButtons.Tools) do
+					for _,b in pairs(ToolTrayButtons.Tools) do
 						b:toDefault()
 					end
 
@@ -74,11 +72,14 @@ ToolTrayButtons.New = function()
 end
 
 function ToolTrayButtons:Awake()
-
+	Theme = self.Controllers.ThemeController.CurrentTheme.ToolTrayButtons
 end
 
 function ToolTrayButtons:Start()
-	Theme = ToolTrayButtons.Controllers.ThemeController.CurrentTheme.ToolTrayButtons
+	while true do
+		wait(3)
+		self.Something = self.Something + 1
+	end
 end
 
 return ToolTrayButtons
